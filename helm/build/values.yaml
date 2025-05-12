@@ -11,7 +11,7 @@ git:
   host: github.com
   # token: 
   webhookSecret: ''
-  pollSchedule: "*/1 * * * *"
+  pollSchedule: "*/10 * * * *"
   pollerImage: "quay.io/wangzheng422/qimgs:rocky9-test-2025.04.30.v01"
   committerEmail: "commitor@wzhlab.top"
   patSecretName: "github-pat-secret"
