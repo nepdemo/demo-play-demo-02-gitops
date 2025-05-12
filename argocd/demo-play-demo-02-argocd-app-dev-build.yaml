@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/nepdemo/demo-play-demo-02-gitops.git
-    targetRevision: wzh-2025.05
+    targetRevision: main
     path: ./helm/build
   destination:
     server: https://kubernetes.default.svc
