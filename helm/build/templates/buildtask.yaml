@@ -56,7 +56,7 @@ spec:
         # Generate tag with date and random number
         DATE_TAG=$(date +%Y%m%d)-$(shuf -i 1000-9999 -n 1)
         # Set the full image name with new tag
-        FULL_IMAGE="${IMAGE_WITHOUT_TAG}:${DATE_TAG}"
+        FULL_IMAGE="${IMAGE_WITHOUT_TAG}:demo-rhdh-${DATE_TAG}"
         # Save for later steps
         echo "${FULL_IMAGE}" > /tekton/home/image-name
         echo "${DATE_TAG}" > /tekton/home/image-tag
