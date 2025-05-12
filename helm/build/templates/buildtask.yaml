@@ -56,6 +56,7 @@ spec:
         - --context=$(workspaces.source.path)/$(params.CONTEXT) # The user does not need to care the workspace and the source.
         - --destination=$(params.IMAGE)
         - --digest-file=$(results.IMAGE_DIGEST.path)
+        - --skip-tls-verify
         # - --ignore-path=/usr/bin/newuidmap
         # - --ignore-path=/usr/bin/newgidmap
       # kaniko assumes it is running as root, which means this example fails on platforms
