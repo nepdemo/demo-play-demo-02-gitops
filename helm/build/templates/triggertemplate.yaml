@@ -34,12 +34,11 @@ spec:
         timeout: 1h0m0s
         workspaces:
           - name: source-folder
-            volumeClaimTemplate:
-              spec:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 1Gi
-          - emptyDir: {}
-            name: maven-settings
+            persistentVolumeClaim:
+              claimName: {{ .Values.app.name }}-pvc1
+          - name: maven-settings
+            persistentVolumeClaim:
+              claimName: {{ .Values.app.name }}-pvc2
+          - name: docker-auth
+            secret:
+              secretName: wzh-docker-authfile
