@@ -21,6 +21,8 @@ spec:
     - name: DOCKERFILE
       description: Path to the Dockerfile to build.
       default: ./Dockerfile
+    - name: DOCKER_CONFIG
+      default: /kaniko/.docker
     - name: CONTEXT
       description: The build context used by Kaniko.
       default: ./
