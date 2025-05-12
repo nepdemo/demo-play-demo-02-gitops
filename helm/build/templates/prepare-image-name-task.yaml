@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: {{ .Values.app.name }}-prepare-image-name
+  name: prepare-image-name-{{ .Values.app.name }}
 spec:
   description: >-
     This task prepares the full image name with a unique tag
