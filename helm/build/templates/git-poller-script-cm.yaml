@@ -12,6 +12,8 @@ data:
 
     set -euo pipefail
 
+    export HOME=/root
+
     REPO_URL="$1"
     BRANCH="$2"
     EVENT_LISTENER_SERVICE="$3" # Tekton EventListener Service Name
