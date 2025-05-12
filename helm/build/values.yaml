@@ -1,0 +1,23 @@
+app:
+  name: demo-play-demo-02
+  namespace: demo-play
+  cluster: .apps.demo-01-rhsys.wzhlab.top
+
+git:
+  branch: main
+  repo: https://github.com/nepdemo/demo-play-demo-02.git
+  org: nepdemo
+  name: demo-play-demo-02
+  host: github.com
+  # token: 
+  webhookSecret: ''
+  pollSchedule: "*/1 * * * *"
+  pollerImage: "quay.io/wangzheng422/qimgs:rocky9-test-2025.04.30.v01"
+  committerEmail: "commitor@wzhlab.top"
+  patSecretName: "github-pat-secret"
+  patSecretKey: "pat"
+
+image:
+  host: image-registry.openshift-image-registry.svc:5000
+  name: demo-play/demo-02
+  tag: latest
