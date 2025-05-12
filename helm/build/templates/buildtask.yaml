@@ -47,7 +47,7 @@ spec:
     - name: IMAGE_URL
       description: URL of the image just built.
   steps:
-    - name: generate-tag
+    - name: prepare-image-name
       workingDir: $(workspaces.source.path)
       image: registry.access.redhat.com/ubi8
       script: |
@@ -62,21 +62,22 @@ spec:
         echo "${DATE_TAG}" > $(workspaces.source.path)/image-tag.txt
         echo "Generated image tag: ${DATE_TAG}"
         echo "Full image name: ${FULL_IMAGE}"
+        
+        # Create a destination file that kaniko can read directly
+        # This avoids shell interpretation issues in the kaniko container
+        echo "${FULL_IMAGE}" > $(workspaces.source.path)/.kaniko-destination
     
     - name: build-and-push
       workingDir: $(workspaces.source.path)
       image: $(params.BUILDER_IMAGE)
-      script: |
-        # Read the generated image name from workspace
-        FULL_IMAGE=$(cat $(workspaces.source.path)/image-name.txt)
-        echo "Using image: ${FULL_IMAGE}"
-        # Execute kaniko with the dynamic image name
-        /kaniko/executor \
-          --dockerfile=$(params.DOCKERFILE) \
-          --context=$(workspaces.source.path)/$(params.CONTEXT) \
-          --destination=${FULL_IMAGE} \
-          --digest-file=$(results.IMAGE_DIGEST.path) \
-          --skip-tls-verify
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.DOCKERFILE)
+        - --context=$(workspaces.source.path)/$(params.CONTEXT)
+        - --destination-file=$(workspaces.source.path)/.kaniko-destination
+        - --digest-file=$(results.IMAGE_DIGEST.path)
+        - --skip-tls-verify
       # kaniko assumes it is running as root, which means this example fails on platforms
       # that default to run containers as random uid (like OpenShift). Adding this securityContext
       # makes it explicit that it needs to run as root.
@@ -87,5 +88,5 @@ spec:
       script: |
         set -e
         # Use the image name with dynamic tag that was generated in the previous step
-        image=$(cat $(workspaces.source.path)/image-name.txt)
+        image=$(cat $(workspaces.source.path)/.kaniko-destination)
         echo -n "${image}" | tee "$(results.IMAGE_URL.path)"
