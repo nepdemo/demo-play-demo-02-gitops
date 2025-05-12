@@ -62,7 +62,7 @@ spec:
         - git-clone # Only needs the source, not the built artifact
       taskRef:
         kind: Task
-        name: repare-image-name-{{ .Values.app.name) }}
+        name: repare-image-name-{{ .Values.app.name }}
       workspaces:
         - name: source # Needs a workspace to write results, even if not strictly using source code
           workspace: source-folder
