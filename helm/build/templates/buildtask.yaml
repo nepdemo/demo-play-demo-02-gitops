@@ -47,10 +47,9 @@ spec:
     - name: IMAGE_URL
       description: URL of the image just built.
   steps:
-    - name: build-and-push
+    - name: generate-tag
       workingDir: $(workspaces.source.path)
-      image: $(params.BUILDER_IMAGE)
-      # Generate a tag using current date (YYYYMMDD) and a random number
+      image: registry.access.redhat.com/ubi8
       script: |
         # Extract image name without tag
         IMAGE_WITHOUT_TAG=$(echo "$(params.IMAGE)" | cut -d ':' -f 1)
@@ -59,14 +58,21 @@ spec:
         # Set the full image name with new tag
         FULL_IMAGE="${IMAGE_WITHOUT_TAG}:${DATE_TAG}"
         # Save for later steps
-        echo "${FULL_IMAGE}" > /tmp/image-name
-        echo "${DATE_TAG}" > /tmp/image-tag
-      # Continue with the build after generating the tag
+        echo "${FULL_IMAGE}" > /tekton/home/image-name
+        echo "${DATE_TAG}" > /tekton/home/image-tag
+        echo "Generated image tag: ${DATE_TAG}"
+        echo "Full image name: ${FULL_IMAGE}"
+    
+    - name: build-and-push
+      workingDir: $(workspaces.source.path)
+      image: $(params.BUILDER_IMAGE)
+      command:
+        - /kaniko/executor
       args:
         - $(params.EXTRA_ARGS)
         - --dockerfile=$(params.DOCKERFILE)
         - --context=$(workspaces.source.path)/$(params.CONTEXT) # The user does not need to care the workspace and the source.
-        - --destination=$(cat /tmp/image-name)
+        - --destination=$(cat /tekton/home/image-name)
         - --digest-file=$(results.IMAGE_DIGEST.path)
         - --skip-tls-verify
         # - --ignore-path=/usr/bin/newuidmap
@@ -81,5 +87,5 @@ spec:
       script: |
         set -e
         # Use the image name with dynamic tag that was generated in the previous step
-        image=$(cat /tmp/image-name)
+        image=$(cat /tekton/home/image-name)
         echo -n "${image}" | tee "$(results.IMAGE_URL.path)"
