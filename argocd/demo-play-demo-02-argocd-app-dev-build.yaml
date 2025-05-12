@@ -33,4 +33,4 @@ spec:
       kind: ConfigMap
       name: git-polling-state-*
       jsonPointers:
-      - /
+      - /data/last-commit-sha
