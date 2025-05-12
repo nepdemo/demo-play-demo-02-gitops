@@ -63,9 +63,9 @@ spec:
       taskRef:
         kind: Task
         name: prepare-image-name-{{ .Values.app.name }}
-      workspaces:
-        - name: source # Needs a workspace to write results, even if not strictly using source code
-          workspace: source-folder
+      # workspaces:
+      #   - name: source # Needs a workspace to write results, even if not strictly using source code
+      #     workspace: source-folder
     - name: build-and-push
       params:
         - name: IMAGE
