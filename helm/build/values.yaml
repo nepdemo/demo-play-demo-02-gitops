@@ -18,6 +18,6 @@ git:
   patSecretKey: "pat"
 
 image:
-  host: image-registry.openshift-image-registry.svc:5000
-  name: demo-play/demo-02
+  host: quay.io
+  name: qimgs/demo-rhdh-02
   tag: latest
