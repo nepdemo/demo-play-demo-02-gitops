@@ -19,5 +19,5 @@ git:
 
 image:
   host: quay.io
-  name: qimgs/demo-rhdh-02
-  tag: latest
+  name: wangzheng422/qimgs
+  tag: demo-rhdh-02
