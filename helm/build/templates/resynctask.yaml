@@ -17,7 +17,7 @@ spec:
     - args:
         - >-
           oc set image deployment/$(params.COMPONENT_ID) -n $(params.NAMESPACE)
-          $(params.COMPONENT_ID)=$(params.IMAGE)
+          quarkus-template=$(params.IMAGE)
       command:
         - /bin/bash
         - '-c'
