@@ -87,6 +87,8 @@ spec:
           value: $(params.component-id)
         - name: NAMESPACE
           value: $(params.namespace)
+        - name: IMAGE
+          value: $(tasks.prepare-image-name.results.full-image-name)
       runAfter:
         - build-and-push
       taskRef:
