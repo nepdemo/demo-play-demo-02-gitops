@@ -1,0 +1,98 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: {{ .Values.app.name }}-pipeline
+  labels:
+    type: pipeline
+    backstage.io/kubernetes-id: ${{values.component_id}}
+spec:
+  params:
+    - name: source-repo
+      description: source repo that contains the application code
+      type: string
+      default: {{ .Values.git.repo }}
+    - name: source-branch
+      description: source branch to build from
+      default: {{ .Values.git.branch }}
+      type: string
+    - name: output-image
+      description: reference of the image that will get created
+      default: {{ include "image.url" . }}
+      type: string
+    - name: component-id
+      description: the component id
+      type: string
+      default: {{ .Values.app.name }}
+    - name: namespace
+      description: the namespace
+      type: string
+      default: {{ .Values.app.namespace }}
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: $(params.source-repo)
+        - name: revision
+          value: $(params.source-branch)
+        - name: sslVerify
+          value: 'false'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source-folder
+    - name: package
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: source-folder
+        - name: maven-settings
+          workspace: maven-settings
+    # - name: prepare-image-name
+    #   params:
+    #     - name: IMAGE
+    #       value: $(params.output-image)
+    #   runAfter:
+    #     - git-clone # Only needs the source, not the built artifact
+    #   taskRef:
+    #     kind: Task
+    #     name: prepare-image-name-{{ .Values.app.name }}
+    #   workspaces:
+    #     - name: source # Needs a workspace to write results, even if not strictly using source code
+    #       workspace: source-folder
+    - name: build-and-push
+      # params:
+      #   - name: IMAGE
+      #     value: $(tasks.prepare-image-name.results.full-image-name) # Use result from prepare task
+      runAfter:
+        - package
+        # - prepare-image-name # Must run after both package and prepare-image-name
+      taskRef:
+        kind: Task
+        name: kaniko-{{ .Values.app.name }}
+      workspaces:
+        - name: source
+          workspace: source-folder
+        - name: dockerconfig
+          workspace: docker-auth
+    - name: resync
+      params:
+        - name: COMPONENT_ID
+          value: $(params.component-id)
+        - name: NAMESPACE
+          value: $(params.namespace)
+      runAfter:
+        - build-and-push
+      taskRef:
+        kind: Task
+        name: resync-{{ .Values.app.name }}
+  workspaces:
+    - name: source-folder
+    - name: maven-settings
+    - name: docker-auth
