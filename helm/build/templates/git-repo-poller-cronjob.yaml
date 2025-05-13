@@ -14,6 +14,9 @@ spec:
         spec:
           serviceAccountName: git-poller-sa # Use the dedicated ServiceAccount
           restartPolicy: OnFailure # Restart the container if it fails, but the Job will finish if the container exits
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
           containers:
           - name: poller
             # Replace with your custom image containing git, curl, kubectl, and jq
